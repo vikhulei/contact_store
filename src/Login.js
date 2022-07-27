@@ -1,31 +1,6 @@
 import { useState } from "react";
-import styled from "styled-components"
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import axios from "axios"
-
-const Section = styled.div`
-position: absolute;
-top: 100px;
-margin-left: 50%;
-padding-top: 10px;
-transform: translateX(-50%);
-width: 400px;
-height: 500px;
-background-color: #63738a;
-`
-
-const Form = styled.form`
-  border: 2px black solid;
-  width: 80%;
-  height: 80%;
-  margin: 20px auto;
-  padding: 70px 10px 120px;
-  background-color: #f2f3f7;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`
+import {Section, Form, Input, GreyButton} from "./styles/Style"
 
 const Login = () => {
   const [user, setUser] = useState("");
@@ -44,9 +19,9 @@ const Login = () => {
 
   return (
     <Section>
-      <h1>Sign In</h1>
+      <h1>Login</h1>
       <Form onSubmit={handleSubmit}>
-        <TextField
+        <Input
           label="username"
           variant="outlined"
           type="text"
@@ -56,7 +31,7 @@ const Login = () => {
           value={user}
           required
         />
-        <TextField
+        <Input
           label="password"
           variant="outlined"
           type="password"
@@ -65,7 +40,7 @@ const Login = () => {
           value={pwd}
           required
         />
-        <Button variant="contained" type="submit" style={{ "backgroundColor": "#63738a" }}>Sign In</Button>
+        <GreyButton variant="contained" type="submit">Sign In</GreyButton>
       </Form>
     </Section>
   );
