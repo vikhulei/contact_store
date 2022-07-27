@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {Section, Form, Input, GreyButton} from "../styles/Style"
 
-const Home = () => {
+const ContactDetails = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,4 +17,4 @@ const Home = () => {
   );
 }
 
-export default Home
+export default ContactDetails

@@ -1,20 +1,34 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios"
-import {Section, Form, Input, GreyButton} from "./styles/Style"
+import { useNavigate } from "react-router-dom"
+import { Section, Form, Input, GreyButton } from "./styles/Style"
+import { UserContext } from "./utils/UserContext";
+
 
 const Login = () => {
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
 
+  const {setAuth } = useContext(UserContext)
+
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const resp = await axios.post("https://interview.intrinsiccloud.net/auth/login", {
-      password: pwd,
-      username: user
-    })
-    console.log(resp.data)
-    setPwd("");
-    setUser("");
+    try {
+      const resp = await axios.post("https://interview.intrinsiccloud.net/auth/login", {
+        password: pwd,
+        username: user
+      })
+      if (resp.status === 200) {
+        setPwd("");
+        setUser("");
+        navigate("/home")
+        setAuth(true)
+      }
+    } catch (error) {
+      alert(error)
+    }
   }
 
   return (
