@@ -1,10 +1,10 @@
 import "./App.css"
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import {useState} from "react"
 import Login from "./Login"
 import Home from "./pages/Home"
 import Profile from "./pages/Profile"
-import ContactsList from "./pages/ContactsList"
+import NewEditContact from "./pages/NewEditContact"
 import ContactDetails from "./pages/ContactDetails"
 import {UserContext} from "./utils/UserContext"
 import ProtectedRoutes from "./utils/ProtectedRoutes"
@@ -14,21 +14,21 @@ const App = () => {
   
   const [auth, setAuth] = useState(false)
 
+  const navigate = useNavigate()
+
   return (
     <div className="App">
-      <Router>
         <UserContext.Provider value={{auth, setAuth}}>
         <Routes>
-          <Route exact path="/" element={<Login />} />
+          <Route exact path="/" element={<Login navigate={navigate} />} />
           <Route element={<ProtectedRoutes />}>
-            <Route path="/home" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/contacts" element={<ContactsList />} />
-            <Route path="/details" element={<ContactDetails />} />
+            <Route path="/home" element={<Home navigate={navigate}/>} />
+            <Route path="/profile" element={<Profile navigate={navigate}/>} />
+            <Route path="/contacts" element={<ContactDetails navigate={navigate}/>} />
+            <Route path="/newedit" element={<NewEditContact navigate={navigate}/>} />
           </Route>
         </Routes>
         </UserContext.Provider>
-      </Router>
     </div>
   );
 }

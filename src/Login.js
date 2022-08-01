@@ -1,17 +1,26 @@
 import { useContext, useState } from "react";
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
-import { Section, Form, Input, GreyButton } from "./styles/Style"
+import { Section, Form, InputField, GreyButton } from "./styles/GeneralStyles"
 import { UserContext } from "./utils/UserContext";
+import OneButtonDialogBox from "./components/OneButtonDialogBox";
 
 
-const Login = () => {
+const Login = ({ navigate }) => {
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
+  const [openDialogBox, setOpenDialogBox] = useState(false)
+  const [buttonTitle, setButtonTitle] = useState("Error")
+  const [buttonText, setButtonText] = useState()
 
-  const {setAuth } = useContext(UserContext)
+  const handleClickOpen = () => {
+    setOpenDialogBox(true);
+  };
 
-  const navigate = useNavigate();
+  const handleClickClose = () => {
+    setOpenDialogBox(false);
+  };
+
+  const { setAuth } = useContext(UserContext)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,25 +36,35 @@ const Login = () => {
         setAuth(true)
       }
     } catch (error) {
-      alert(error)
+      setButtonText(error.toString())
+      // handleClickOpen()
+    }
+    finally {
+      setAuth(true)
+      navigate("/home")
     }
   }
 
   return (
     <Section>
+      <OneButtonDialogBox
+        openDialogBox={openDialogBox}
+        handleClickClose={handleClickClose}
+        buttonTitle={buttonTitle}
+        buttonText={buttonText}
+      />
       <h1>Login</h1>
-      <Form onSubmit={handleSubmit}>
-        <Input
+      <Form onSubmit={handleSubmit} autoComplete="off">
+        <InputField
           label="username"
           variant="outlined"
           type="text"
           id="username"
-          autoComplete="off"
           onChange={(e) => setUser(e.target.value)}
           value={user}
           required
         />
-        <Input
+        <InputField
           label="password"
           variant="outlined"
           type="password"
