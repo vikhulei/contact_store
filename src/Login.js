@@ -5,7 +5,7 @@ import { UserContext } from "./utils/UserContext";
 import OneButtonDialogBox from "./components/OneButtonDialogBox";
 
 
-const Login = ({ navigate }) => {
+const Login = ({ navigate, setToken, setPassword }) => {
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const [openDialogBox, setOpenDialogBox] = useState(false)
@@ -30,6 +30,8 @@ const Login = ({ navigate }) => {
         username: user
       })
       if (resp.status === 200) {
+        setToken(resp.data.token)
+        setPassword(pwd)
         setPwd("");
         setUser("");
         navigate("/home")

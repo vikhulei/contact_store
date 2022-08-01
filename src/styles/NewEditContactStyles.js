@@ -8,7 +8,7 @@ const Wrapper = styled(Form)`
 `
 
 const SectionContacts = styled(Section) `
-  height: 700px;
+  min-height: 700px;
 `
 
 const AddNumberButton = styled(GreyButton) `
@@ -18,18 +18,22 @@ const AddNumberButton = styled(GreyButton) `
 `
 
 const ButtonsWrapper = styled.div `
+&& {
+
+  position: absolute;
+  width: 100%;
+  
   display: flex;
-  margin-top: 70px;
-  // bottom: 0;
   justify-content: space-between;
+  // top: 120%;
+  bottom: 0;
+}
 `
 
 const NumbersWrapper = styled.div`
   display: flex;
+  flex-direction: column;
+  text-align: center;
 `
 
-const Number = styled.div`
-  display: block;
-`
-
-export {Wrapper, SectionContacts, AddNumberButton, ButtonsWrapper, NumbersWrapper, Number}
+export {Wrapper, SectionContacts, AddNumberButton, ButtonsWrapper, NumbersWrapper}

@@ -39,4 +39,9 @@ const Form = styled.form`
   justify-content: space-between;
 `
 
-export { Section, Form, InputField, GreyButton, Select, MenuItem, InputLabel, FormControl }
+const FormControlContacts = styled(FormControl) `
+  height: 100%;
+`
+
+
+export { Section, Form, InputField, GreyButton, Select, MenuItem, InputLabel, FormControlContacts, FormControl }

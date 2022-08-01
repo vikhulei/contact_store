@@ -1,55 +1,28 @@
 import { useState } from "react";
-import { InputField, GreyButton } from "../styles/GeneralStyles"
-import { Wrapper, SectionContacts, AddNumberButton, ButtonsWrapper, NumbersWrapper, Number } from "../styles/NewEditContactStyles"
-import FormControl from "@mui/material/FormControl"
+import { InputField, GreyButton, FormControlContacts } from "../styles/GeneralStyles"
+import { Wrapper, SectionContacts, AddNumberButton, ButtonsWrapper, NumbersWrapper } from "../styles/NewEditContactStyles"
 import AddPhoneNumber from "../components/AddPhoneNumber"
 
-const contacts = {
-  company: "PC",
-  contactName: "John Doe",
-  phoneNumbers: [
-    {
-      areaCode: "011",
-      category: "HOME",
-      countryCode: "11",
-      extension: "1",
-      id: "1",
-      number: "1111111"
-    },
-    {
-      areaCode: "022",
-      category: "HOME",
-      countryCode: "22",
-      extension: "2",
-      id: "2",
-      number: "2222222"
-    },
-    {
-      areaCode: "033",
-      category: "HOME",
-      countryCode: "33",
-      extension: "3",
-      id: "3",
-      number: "3333333"
-    }
-  ],
-  primaryEmailAddress: "jodoe@email.com"
-}
 
+const NewEditContact = ({ navigate, token }) => {
 
-const NewEditContact = ({ navigate }) => {
+  const [contact, setContact] = useState({
+    company: "",
+    contactName: "",
+    phoneNumbers: [
+    ],
+    primaryEmailAddress: ""
 
-  const [check, setCheck] = useState(
-    {
-      name: "John Doe",
-      company: "PC",
-      email: "email@email.com",
-      phone: [
-        11111111,
-        2222222222
-      ]
-    })
-  const [edit, setEdit] = useState(false)
+  })
+
+  const [newNumber, setNewNumber] = useState ({
+    areaCode: "",
+    category: "HOME",
+    countryCode: "",
+    extension: "",
+    id: "",
+    number: ""
+  })
 
   const [openAddPhoneNumber, setOpenAddPhoneNumber] = useState(false)
 
@@ -61,87 +34,86 @@ const NewEditContact = ({ navigate }) => {
     setOpenAddPhoneNumber(false);
   };
 
+  const addNewNumber = () => {
+    contact.phoneNumbers.push(newNumber)
+    handleClickClose()
+  }
+
+  const saveNumber = () => {
+    console.log(contact)
+  }
+
+  const editNumber = (id) => {
+    
+    setContact(prev => ({...prev, phoneNumbers: contact.phoneNumbers.filter((val, ind) => ind !== id)}))
+    console.log(contact.phoneNumbers)
+    // let updatedPhoneNumbers = phoneNumbers.splice(id, 1)
+    // setContact(prev => ({ ...prev, phoneNumbers: updatedPhoneNumbers }))
+  }
+
   return (
     <SectionContacts>
       <h1>Contacts</h1>
-      <Wrapper>
-        <FormControl>
+      <Wrapper autoComplete="off">
+        <FormControlContacts>
           <AddPhoneNumber
             openAddPhoneNumber={openAddPhoneNumber}
             handleClickClose={handleClickClose}
+            token={token}
+            newNumber={newNumber}
+            setNewNumber={setNewNumber}
+            addNewNumber={addNewNumber}
           />
           <InputField
             label="Name"
             type="text"
             variant="standard"
-            readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, name: e.target.value })) : null}
-            value={check.name}
+            autoComplete="off"
+            onChange={(e) => setContact(prev => ({ ...prev, contactName: e.target.value }))}
+            value={contact.contactName}
           />
           <InputField
             label="Company"
             type="text"
             variant="standard"
             readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, company: e.target.value })) : null}
-            value={check.company}
+            onChange={(e) => setContact(prev => ({ ...prev, company: e.target.value }))}
+            value={contact.company}
           />
           <InputField
             label="Email"
             type="text"
             variant="standard"
-            readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, email: e.target.value })) : null}
-            value={check.email}
+            onChange={(e) => setContact(prev => ({ ...prev, primaryEmailAddress: e.target.value }))}
+            value={contact.primaryEmailAddress}
           />
-          <AddNumberButton variant="contained" onClick={handleClickOpen}>Add phone number</AddNumberButton>
+          <AddNumberButton variant="contained" onClick={handleClickOpen}>Add phone number
+          </AddNumberButton>
+
           <NumbersWrapper>
-            <Number>
-              {contacts.phoneNumbers.map((val, idx) => {
-                return <InputField
-                  key={idx}
+              {contact.phoneNumbers.map((val, idx) => {
+                return <div key={idx}>
+                <InputField
                   type="text"
                   variant="standard"
-                  value={val.countryCode}
+                  value={`(${val.countryCode}) ${val.areaCode}-${val.extension}-${val.number}`}
                 />
+              <GreyButton variant="contained" onClick={(e) => {
+                e.preventDefault()
+                editNumber(idx)}
+                }
+                style={{"margin": "0 0 10px 10px"}}
+                >
+                Delete
+                </GreyButton>
+              </div>
               })}
-            </Number>
-            <Number>
-              {contacts.phoneNumbers.map((val, idx) => {
-                return <InputField
-                  key={idx}
-                  type="text"
-                  variant="standard"
-                  value={val.areaCode}
-                />
-              })}
-            </Number>
-            <Number>
-              {contacts.phoneNumbers.map((val, idx) => {
-                return <InputField
-                  key={idx}
-                  type="text"
-                  variant="standard"
-                  value={val.extension}
-                />
-              })}
-            </Number>
-            <Number>
-              {contacts.phoneNumbers.map((val, idx) => {
-                return <InputField
-                  key={idx}
-                  type="text"
-                  variant="standard"
-                  value={val.number}
-                />
-              })}
-            </Number>
-          </NumbersWrapper>
+            </NumbersWrapper>
           <ButtonsWrapper>
-            <GreyButton variant="contained" style={{ "width": "40%" }} onClick={(() => navigate(-1))}>Save</GreyButton>
+            <GreyButton variant="contained" style={{ "width": "40%" }} onClick={saveNumber}>Save</GreyButton>
             <GreyButton variant="contained" style={{ "width": "40%" }} onClick={(() => navigate(-1))}>Cancel</GreyButton>
           </ButtonsWrapper>
-        </FormControl>
+        </FormControlContacts>
       </Wrapper>
     </SectionContacts>
   );

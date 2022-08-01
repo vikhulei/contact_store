@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react"
+import axios from "axios"
 import styled from "styled-components"
 import Button from '@mui/material/Button';
 import { Select, MenuItem, InputLabel, FormControl } from "../styles/GeneralStyles"
@@ -26,12 +28,41 @@ const FormControlCountry = styled(FormControl) `
 }
 `
 
-const AddPhoneNumber = ({ openAddPhoneNumber, handleClickClose }) => {
+// https://interview.intrinsiccloud.net/utility/countries
+
+const AddPhoneNumber = ({ openAddPhoneNumber, handleClickClose, token, newNumber, setNewNumber, addNewNumber }) => {
+
+  const [countries, setCountries] = useState([])
+  const [countryCode, setCountryCode0] = useState("")
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
     handleClickClose()
   }
+
+const getCountries = async () => {
+  const result = await axios.get("https://interview.intrinsiccloud.net/utility/countries", 
+  { headers: {"Authorization" : `Bearer ${token}`} }
+  )
+  // console.log(result.data)
+  setCountries(result.data)
+}
+
+const countryNames = countries.map((value, idx) => {
+  return <MenuItem key={idx} value={value.dialCode}>
+    {value.name}
+  </MenuItem>
+})
+
+const getCountryCode = (e) => {
+    setCountryCode0(e.target.value)
+    setNewNumber(prev => ({ ...prev, countryCode: e.target.value }))
+}
+
+useEffect(() => {
+  getCountries()
+}, [])
 
   return (
     <div>
@@ -57,6 +88,8 @@ const AddPhoneNumber = ({ openAddPhoneNumber, handleClickClose }) => {
               variant="standard"
               required
               readOnly
+              onChange={(e => e.target.value)}
+              value={countryCode}
             />
             <FormControlCountry variant="standard">
             <InputLabel id="phonenumber" >Choose country</InputLabel>
@@ -65,10 +98,10 @@ const AddPhoneNumber = ({ openAddPhoneNumber, handleClickClose }) => {
             labelId="phonenumber"
             id="phonenumber"
             label="Choose country"
+            onChange={getCountryCode}
+            value={countryCode}
             >
-              <MenuItem>111111</MenuItem>
-              <MenuItem>22222</MenuItem>
-              <MenuItem>333333</MenuItem>
+              {countryNames}
             </Select>
             </FormControlCountry>
           </div>
@@ -77,20 +110,34 @@ const AddPhoneNumber = ({ openAddPhoneNumber, handleClickClose }) => {
             type="text"
             variant="standard"
             required
+            onChange={e => setNewNumber(prev => ({ ...prev, areaCode: e.target.value }))}
+            value={newNumber.areaCode}
           />
           <Input
             label="Extension"
-            type="password"
+            type="text"
             variant="standard"
+            onChange={e => setNewNumber(prev => ({ ...prev, extension: e.target.value }))}
+            value={newNumber.extension}
           />
           <Input
             label="Number"
-            type="password"
+            type="text"
             variant="standard"
             required
+            onChange={e => setNewNumber(prev => ({ ...prev, number: e.target.value }))}
+            value={newNumber.number}
+          />
+          <Input
+            label="id"
+            type="text"
+            variant="standard"
+            required
+            onChange={e => setNewNumber(prev => ({ ...prev, id: e.target.value }))}
+            value={newNumber.id}
           />
           <DialogActions>
-            <Button autoFocus type="submit">Add</Button>
+            <Button onClick={addNewNumber}>Add</Button>
             <Button onClick={((e) => {
               e.preventDefault()
               handleClickClose()
