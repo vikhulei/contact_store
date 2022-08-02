@@ -1,42 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { MenuItem, InputField } from "../styles/GeneralStyles"
 import { Wrapper, InputFormControl, ButtonsFormControl, SectionContacts, SelectContact, ButtonsWrapper, GreyButtonContacts } from "../styles/ContactDetailsStyles"
-import TwoButtonsDialogBox from "../components/TwoButtonsDialogBox";
+import DeleteContact from "../components/DeleteContact";
 
-const object = [
-  {
-    id: 1,
-    value: "111111"
-  },
-  {
-    id: 2,
-    value: "222222"
-  },
-  {
-    id: 3,
-    value: "3333333"
-  },
-  {
-    id: 4,
-    value: "44444444"
-  }
-]
 
-const ContactDetails = ({ navigate }) => {
-
+const ContactDetails = ({ navigate, token }) => {
+  const [contacts, setContacts] = useState([])
+  const [selectedContact, setSelectedContact] = useState()
+  const [contactId, setContactId] = useState("")
   const [contactName, setContactName] = useState("")
-  const [check, setCheck] = useState(
-    {
-      name: "John Doe",
-      company: "PC",
-      email: "email@email.com",
-      phone: [
-        11111111,
-        2222222222
-      ]
-    })
-  const [edit, setEdit] = useState(false)
   const [openDialogBox, setOpenDialogBox] = useState(false)
+
+
+  const getContacts = async () => {
+    try {
+      const resp = await axios.get("https://interview.intrinsiccloud.net/contacts?name=user3",
+        { headers: { "Authorization": `Bearer ${token}` } },
+      )
+      if (resp.status === 200) {
+        setContacts(resp.data)
+        setSelectedContact(contacts[0])
+      }
+    } catch (error) {
+      alert(error.toString())
+      // setButtonText(error.toString())
+      // handleClickOpen()
+    }
+  }
 
   const handleClickOpen = () => {
     setOpenDialogBox(true);
@@ -47,36 +38,46 @@ const ContactDetails = ({ navigate }) => {
   };
 
   const action = () => {
-    alert("Contact deleted")
+    getContacts()
     handleClickClose()
   }
 
   const dataForSelect =
-    object.map((val, inx) => {
-      return <MenuItem key={inx} value={val.value}>{val.value}</MenuItem>
+    contacts.map((val, inx) => {
+      return <MenuItem key={inx} value={val.id}>{val.contactName}</MenuItem>
     })
 
   const handleSelect = (e) => {
     e.preventDefault();
-    setContactName(e.target.value)
+    const contact = contacts.filter(value => value.id === e.target.value)
+    setSelectedContact(contact[0])
+    setContactId(contact[0].id)
+    setContactName(contact[0].contactName)
   }
+
+  useEffect(() => {
+    getContacts();
+  }, [])
 
   return (
 
     <SectionContacts>
-      <TwoButtonsDialogBox
+      <DeleteContact
         openDialogBox={openDialogBox}
         handleClickClose={handleClickClose}
+        token={token}
+        contactId={contactId}
         action={action}
         buttonTitle="Delete"
-        buttonText="Are you sure you want to delete this contact?"
+        buttonText={`Are you sure you want to delete ${contactName} from the database?`}
       />
+
       <h1>Contacts</h1>
       <Wrapper>
         <InputFormControl>
           <SelectContact
             onChange={handleSelect}
-            value={contactName}
+            value={selectedContact ? selectedContact.id : ""}
           >
             {dataForSelect}
           </SelectContact>
@@ -85,26 +86,40 @@ const ContactDetails = ({ navigate }) => {
             type="text"
             variant="standard"
             readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, name: e.target.value })) : null}
-            value={check.name}
+            onChange={(e) => e.target.value}
+            value={selectedContact ? selectedContact.contactName : ""}
           />
           <InputField
             label="Company"
             type="text"
             variant="standard"
             readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, company: e.target.value })) : null}
-            value={check.company}
+            onChange={(e) => e.target.value}
+            value={selectedContact ? selectedContact.company : ""}
           />
           <InputField
             label="Email"
             type="text"
             variant="standard"
             readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, email: e.target.value })) : null}
-            value={check.email}
+            onChange={(e) => e.target.value}
+            value={selectedContact ? selectedContact.primaryEmailAddress : ""}
           />
-          <InputField
+
+          <div>
+            {selectedContact ? selectedContact.phoneNumbers.map((val, idx) => {
+              return <div key={idx}>
+              <InputField
+                label="Phone number"
+                type="text"
+                variant="standard"
+                value={val.phoneNumberFormatted}
+              />
+              </div>
+            }) : null}
+          </div>
+
+          {/* <InputField
             label="Phone Number(s)"
             type="text"
             variant="standard"
@@ -125,7 +140,7 @@ const ContactDetails = ({ navigate }) => {
             readOnly
             onChange={(e) => edit ? setCheck(prev => ({ ...prev, phone: { ...prev.phone, [2]: e.target.value } })) : null}
             value={check.phone[2] ? check.phone[2] : ""}
-          />
+          /> */}
         </InputFormControl>
         <ButtonsFormControl>
           <ButtonsWrapper>

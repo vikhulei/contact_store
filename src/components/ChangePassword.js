@@ -23,11 +23,16 @@ const [retypePassword, setRetypePassword] = useState("")
 const postNewPassword = async() => {
     
     try {
-      const resp = await axios.post("https://interview.intrinsiccloud.net/profile/changePassword?name=user3", 
-      { headers: {"Authorization" : `Bearer ${token}`},
-        newPassword: oldPassword,
-        oldPassword: newPassword
+      const resp = await axios.post("https://interview.intrinsiccloud.net/profile/changePassword?name=user3",
+      {
+        newPassword: newPassword,
+        oldPassword: oldPassword
+      }, {
+        headers: {
+        "Authorization" : `Bearer ${token}`
+      }  
       })
+
       if (resp.status === 200) {
         alert("all posted")
       }

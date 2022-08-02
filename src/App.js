@@ -35,7 +35,10 @@ const App = () => {
               token={token}
               password={password}
               />} />
-            <Route path="/contacts" element={<ContactDetails navigate={navigate}/>} />
+            <Route path="/contacts" element={<ContactDetails
+            navigate={navigate}
+            token={token}
+            />} />
             <Route path="/newedit" element={<NewEditContact
               navigate={navigate}
               token={token}

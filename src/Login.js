@@ -39,11 +39,7 @@ const Login = ({ navigate, setToken, setPassword }) => {
       }
     } catch (error) {
       setButtonText(error.toString())
-      // handleClickOpen()
-    }
-    finally {
-      setAuth(true)
-      navigate("/home")
+      handleClickOpen()
     }
   }
 

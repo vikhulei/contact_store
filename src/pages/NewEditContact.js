@@ -1,19 +1,22 @@
 import { useState } from "react";
+import axios from "axios"
 import { InputField, GreyButton, FormControlContacts } from "../styles/GeneralStyles"
 import { Wrapper, SectionContacts, AddNumberButton, ButtonsWrapper, NumbersWrapper } from "../styles/NewEditContactStyles"
 import AddPhoneNumber from "../components/AddPhoneNumber"
 
 
+
 const NewEditContact = ({ navigate, token }) => {
 
-  const [contact, setContact] = useState({
-    company: "",
-    contactName: "",
-    phoneNumbers: [
-    ],
-    primaryEmailAddress: ""
-
-  })
+  const [contact, setContact] = useState(
+   {
+  company: "",
+  contactName: "",
+  phoneNumbers: [
+  ],
+  primaryEmailAddress: ""
+} 
+  )
 
   const [newNumber, setNewNumber] = useState ({
     areaCode: "",
@@ -39,16 +42,36 @@ const NewEditContact = ({ navigate, token }) => {
     handleClickClose()
   }
 
-  const saveNumber = () => {
+  const saveNumber = async (e) => {
+    e.preventDefault();
     console.log(contact)
+    try {
+      const resp = await axios.post("https://interview.intrinsiccloud.net/contacts?name=user3",
+      contact,
+      { headers: {"Authorization" : `Bearer ${token}`} },
+    )
+    console.log(resp)
+      if (resp.status === 200) {
+        alert("all is good")
+        setContact({
+          company: "",
+          contactName: "",
+          phoneNumbers: [
+          ],
+          primaryEmailAddress: ""
+        })
+      }
+    } catch (error) {
+      alert(error.toString())
+      // setButtonText(error.toString())
+      // handleClickOpen()
+    }
   }
 
-  const editNumber = (id) => {
+  const deleteNumber = (id) => {
     
     setContact(prev => ({...prev, phoneNumbers: contact.phoneNumbers.filter((val, ind) => ind !== id)}))
     console.log(contact.phoneNumbers)
-    // let updatedPhoneNumbers = phoneNumbers.splice(id, 1)
-    // setContact(prev => ({ ...prev, phoneNumbers: updatedPhoneNumbers }))
   }
 
   return (
@@ -70,7 +93,7 @@ const NewEditContact = ({ navigate, token }) => {
             variant="standard"
             autoComplete="off"
             onChange={(e) => setContact(prev => ({ ...prev, contactName: e.target.value }))}
-            value={contact.contactName}
+            value={contact ? contact.contactName : ""}
           />
           <InputField
             label="Company"
@@ -78,20 +101,20 @@ const NewEditContact = ({ navigate, token }) => {
             variant="standard"
             readOnly
             onChange={(e) => setContact(prev => ({ ...prev, company: e.target.value }))}
-            value={contact.company}
+            value={contact ? contact.company : ""}
           />
           <InputField
             label="Email"
             type="text"
             variant="standard"
             onChange={(e) => setContact(prev => ({ ...prev, primaryEmailAddress: e.target.value }))}
-            value={contact.primaryEmailAddress}
+            value={contact ? contact.primaryEmailAddress : ""}
           />
           <AddNumberButton variant="contained" onClick={handleClickOpen}>Add phone number
           </AddNumberButton>
 
           <NumbersWrapper>
-              {contact.phoneNumbers.map((val, idx) => {
+              {contact ? contact.phoneNumbers.map((val, idx) => {
                 return <div key={idx}>
                 <InputField
                   type="text"
@@ -100,18 +123,29 @@ const NewEditContact = ({ navigate, token }) => {
                 />
               <GreyButton variant="contained" onClick={(e) => {
                 e.preventDefault()
-                editNumber(idx)}
+                deleteNumber(idx)
+              }
                 }
                 style={{"margin": "0 0 10px 10px"}}
                 >
                 Delete
                 </GreyButton>
               </div>
-              })}
+              }) : []}
             </NumbersWrapper>
           <ButtonsWrapper>
             <GreyButton variant="contained" style={{ "width": "40%" }} onClick={saveNumber}>Save</GreyButton>
-            <GreyButton variant="contained" style={{ "width": "40%" }} onClick={(() => navigate(-1))}>Cancel</GreyButton>
+            
+            <GreyButton
+            variant="contained"
+            style={{ "width": "40%" }}
+            onClick={
+              // (() => console.log(contact))
+              (() => navigate(-1))
+            }
+            >
+              Cancel
+              </GreyButton>
           </ButtonsWrapper>
         </FormControlContacts>
       </Wrapper>
