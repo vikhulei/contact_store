@@ -14,7 +14,7 @@ const Input = styled(TextField) `
     left: 20px;
 `
 
-const ChangePassword = ({openDialogBox, handleClickClose, buttonTitle, buttonText, password, token}) => {
+const ChangePassword = ({openDialogBox, handleClickClose, buttonTitle, buttonText, password, token, user}) => {
 
 const [oldPassword, setOldPassword] = useState("")
 const [newPassword, setNewPassword] = useState("")
@@ -23,15 +23,13 @@ const [retypePassword, setRetypePassword] = useState("")
 const postNewPassword = async() => {
     
     try {
-      const resp = await axios.post("https://interview.intrinsiccloud.net/profile/changePassword?name=user3",
+      const resp = await axios.post("https://interview.intrinsiccloud.net/profile/changePassword",
       {
         newPassword: newPassword,
         oldPassword: oldPassword
-      }, {
-        headers: {
-        "Authorization" : `Bearer ${token}`
-      }  
-      })
+      },
+       { params: { name: user } ,
+        headers: {"Authorization" : `Bearer ${token}`} })
 
       if (resp.status === 200) {
         alert("all posted")

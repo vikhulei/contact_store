@@ -6,19 +6,19 @@ import AddPhoneNumber from "../components/AddPhoneNumber"
 
 
 
-const NewEditContact = ({ navigate, token }) => {
+const NewEditContact = ({ navigate, token, contact, setContact, user }) => {
 
-  const [contact, setContact] = useState(
-   {
-  company: "",
-  contactName: "",
-  phoneNumbers: [
-  ],
-  primaryEmailAddress: ""
-} 
+  const [newContact, setNewContact] = useState(
+    {
+      company: "",
+      contactName: "",
+      phoneNumbers: [
+      ],
+      primaryEmailAddress: ""
+    }
   )
 
-  const [newNumber, setNewNumber] = useState ({
+  const [newNumber, setNewNumber] = useState({
     areaCode: "",
     category: "HOME",
     countryCode: "",
@@ -28,6 +28,7 @@ const NewEditContact = ({ navigate, token }) => {
   })
 
   const [openAddPhoneNumber, setOpenAddPhoneNumber] = useState(false)
+  const [phoneNumberFormatted, setPhoneNumberFormatted] = useState()
 
   const handleClickOpen = () => {
     setOpenAddPhoneNumber(true);
@@ -39,6 +40,8 @@ const NewEditContact = ({ navigate, token }) => {
 
   const addNewNumber = () => {
     contact.phoneNumbers.push(newNumber)
+    setPhoneNumberFormatted(`${newNumber.countryCode}-${newNumber.areaCode}-${newNumber.number}#${newNumber.extension}`)
+    console.log(contact.phoneNumbers)
     handleClickClose()
   }
 
@@ -46,11 +49,12 @@ const NewEditContact = ({ navigate, token }) => {
     e.preventDefault();
     console.log(contact)
     try {
-      const resp = await axios.post("https://interview.intrinsiccloud.net/contacts?name=user3",
-      contact,
-      { headers: {"Authorization" : `Bearer ${token}`} },
-    )
-    console.log(resp)
+      const resp = await axios.post("https://interview.intrinsiccloud.net/contacts",
+        contact,
+        { params: { name: user } ,
+         headers: { "Authorization": `Bearer ${token}` } },
+      )
+      console.log(resp)
       if (resp.status === 200) {
         alert("all is good")
         setContact({
@@ -69,9 +73,7 @@ const NewEditContact = ({ navigate, token }) => {
   }
 
   const deleteNumber = (id) => {
-    
-    setContact(prev => ({...prev, phoneNumbers: contact.phoneNumbers.filter((val, ind) => ind !== id)}))
-    console.log(contact.phoneNumbers)
+    setContact(prev => ({ ...prev, phoneNumbers: contact.phoneNumbers.filter((val, ind) => ind !== id) }))
   }
 
   return (
@@ -86,6 +88,8 @@ const NewEditContact = ({ navigate, token }) => {
             newNumber={newNumber}
             setNewNumber={setNewNumber}
             addNewNumber={addNewNumber}
+            phoneNumberFormatted={phoneNumberFormatted}
+            setPhoneNumberFormatted={setPhoneNumberFormatted}
           />
           <InputField
             label="Name"
@@ -114,38 +118,42 @@ const NewEditContact = ({ navigate, token }) => {
           </AddNumberButton>
 
           <NumbersWrapper>
-              {contact ? contact.phoneNumbers.map((val, idx) => {
-                return <div key={idx}>
+            {contact ? contact.phoneNumbers.map((val, idx) => {
+              return <div key={idx}>
                 <InputField
                   type="text"
                   variant="standard"
-                  value={`(${val.countryCode}) ${val.areaCode}-${val.extension}-${val.number}`}
+                  // value={`(${val.countryCode}) ${val.areaCode}-${val.extension}-${val.number}`}
+                  value={val.phoneNumberFormatted}
                 />
-              <GreyButton variant="contained" onClick={(e) => {
-                e.preventDefault()
-                deleteNumber(idx)
-              }
-                }
-                style={{"margin": "0 0 10px 10px"}}
-                >
-                Delete
+                <GreyButton
+                  variant="contained"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    deleteNumber(idx)
+                  }}
+                  style={{ "margin": "0 0 10px 10px" }}>
+                  Delete
                 </GreyButton>
               </div>
-              }) : []}
-            </NumbersWrapper>
+            }) : []}
+          </NumbersWrapper>
           <ButtonsWrapper>
-            <GreyButton variant="contained" style={{ "width": "40%" }} onClick={saveNumber}>Save</GreyButton>
-            
             <GreyButton
-            variant="contained"
-            style={{ "width": "40%" }}
-            onClick={
-              // (() => console.log(contact))
-              (() => navigate(-1))
-            }
-            >
+              variant="contained"
+              style={{ "width": "40%" }}
+              onClick={saveNumber}>
+              Save
+            </GreyButton>
+
+            <GreyButton
+              variant="contained"
+              style={{ "width": "40%" }}
+              // onClick={(() => navigate(-1))}
+              onClick={(() => console.log(contact.phoneNumbers[1].phoneNumberFormatted))}
+              >
               Cancel
-              </GreyButton>
+            </GreyButton>
           </ButtonsWrapper>
         </FormControlContacts>
       </Wrapper>

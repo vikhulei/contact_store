@@ -30,11 +30,10 @@ const FormControlCountry = styled(FormControl) `
 
 // https://interview.intrinsiccloud.net/utility/countries
 
-const AddPhoneNumber = ({ openAddPhoneNumber, handleClickClose, token, newNumber, setNewNumber, addNewNumber }) => {
+const AddPhoneNumber = ({ openAddPhoneNumber, handleClickClose, token, newNumber, setNewNumber, addNewNumber, phoneNumberFormatted, setPhoneNumberFormatted }) => {
 
   const [countries, setCountries] = useState([])
   const [countryCode, setCountryCode0] = useState("")
-
 
   const handleSubmit = (e) => {
     e.preventDefault()

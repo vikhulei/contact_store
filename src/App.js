@@ -15,6 +15,8 @@ const App = () => {
   const [auth, setAuth] = useState(false)
   const [password, setPassword] = useState("")
   const [token, setToken] = useState("")
+  const [user, setUser] = useState("")
+  const [contact, setContact] = useState()
 
   const navigate = useNavigate()
 
@@ -27,6 +29,7 @@ const App = () => {
           navigate={navigate}
           setToken={setToken}
           setPassword={setPassword}
+          setUser={setUser}
           />} />
           <Route element={<ProtectedRoutes />}>
             <Route path="/home" element={<Home navigate={navigate}/>} />
@@ -34,14 +37,21 @@ const App = () => {
               navigate={navigate}
               token={token}
               password={password}
+              user={user}
               />} />
             <Route path="/contacts" element={<ContactDetails
             navigate={navigate}
             token={token}
+            user={user}
+            contact={contact}
+            setContact={setContact}
             />} />
             <Route path="/newedit" element={<NewEditContact
               navigate={navigate}
               token={token}
+              user={user}
+              contact={contact}
+              setContact={setContact}
               />} />
           </Route>
         </Routes>

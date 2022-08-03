@@ -5,18 +5,19 @@ import { Wrapper, InputFormControl, ButtonsFormControl, SectionContacts, SelectC
 import DeleteContact from "../components/DeleteContact";
 
 
-const ContactDetails = ({ navigate, token }) => {
+const ContactDetails = ({ navigate, token, contact, setContact, user }) => {
   const [contacts, setContacts] = useState([])
   const [selectedContact, setSelectedContact] = useState()
   const [contactId, setContactId] = useState("")
   const [contactName, setContactName] = useState("")
-  const [openDialogBox, setOpenDialogBox] = useState(false)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
 
 
   const getContacts = async () => {
     try {
-      const resp = await axios.get("https://interview.intrinsiccloud.net/contacts?name=user3",
-        { headers: { "Authorization": `Bearer ${token}` } },
+      const resp = await axios.get("https://interview.intrinsiccloud.net/contacts",
+        { params: { name: user } ,
+         headers: { "Authorization": `Bearer ${token}` } },
       )
       if (resp.status === 200) {
         setContacts(resp.data)
@@ -29,17 +30,17 @@ const ContactDetails = ({ navigate, token }) => {
     }
   }
 
-  const handleClickOpen = () => {
-    setOpenDialogBox(true);
+  const handleDeleteDialogOpen = () => {
+    setOpenDeleteDialog(true);
   };
 
-  const handleClickClose = () => {
-    setOpenDialogBox(false);
+  const handleDeleteDialogClose = () => {
+    setOpenDeleteDialog(false);
   };
 
   const action = () => {
     getContacts()
-    handleClickClose()
+    handleDeleteDialogClose()
   }
 
   const dataForSelect =
@@ -55,6 +56,23 @@ const ContactDetails = ({ navigate, token }) => {
     setContactName(contact[0].contactName)
   }
 
+  const addNewContact = () => {
+    setContact({
+      company: "",
+      contactName: "",
+      phoneNumbers: [
+      ],
+      primaryEmailAddress: ""
+    })
+    navigate("/newedit");
+  }
+
+const editContact = () => {
+  setContact(selectedContact)
+  console.log(selectedContact)
+    navigate("/newedit");
+  }
+
   useEffect(() => {
     getContacts();
   }, [])
@@ -63,8 +81,8 @@ const ContactDetails = ({ navigate, token }) => {
 
     <SectionContacts>
       <DeleteContact
-        openDialogBox={openDialogBox}
-        handleClickClose={handleClickClose}
+        openDialogBox={openDeleteDialog}
+        handleClickClose={handleDeleteDialogClose}
         token={token}
         contactId={contactId}
         action={action}
@@ -119,36 +137,14 @@ const ContactDetails = ({ navigate, token }) => {
             }) : null}
           </div>
 
-          {/* <InputField
-            label="Phone Number(s)"
-            type="text"
-            variant="standard"
-            readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, phone: { ...prev.phone, [0]: e.target.value } })) : null}
-            value={check.phone[0]}
-          />
-          <InputField
-            type="text"
-            variant="standard"
-            readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, phone: { ...prev.phone, [1]: e.target.value } })) : null}
-            value={check.phone[1]}
-          />
-          <InputField
-            type="text"
-            variant="standard"
-            readOnly
-            onChange={(e) => edit ? setCheck(prev => ({ ...prev, phone: { ...prev.phone, [2]: e.target.value } })) : null}
-            value={check.phone[2] ? check.phone[2] : ""}
-          /> */}
         </InputFormControl>
         <ButtonsFormControl>
           <ButtonsWrapper>
-            <GreyButtonContacts variant="contained" onClick={(() => navigate("/newedit"))}>Edit</GreyButtonContacts>
-            <GreyButtonContacts variant="contained" onClick={handleClickOpen}>Delete</GreyButtonContacts>
+            <GreyButtonContacts variant="contained" onClick={editContact}>Edit</GreyButtonContacts>
+            <GreyButtonContacts variant="contained" onClick={handleDeleteDialogOpen}>Delete</GreyButtonContacts>
           </ButtonsWrapper>
           <ButtonsWrapper>
-            <GreyButtonContacts variant="contained" onClick={(() => navigate("/newedit"))}>Add New</GreyButtonContacts>
+            <GreyButtonContacts variant="contained" onClick={addNewContact}>Add New</GreyButtonContacts>
             <GreyButtonContacts variant="contained" onClick={(() => navigate(-1))}>Go Back</GreyButtonContacts>
           </ButtonsWrapper>
         </ButtonsFormControl>

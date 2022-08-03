@@ -5,8 +5,8 @@ import { UserContext } from "./utils/UserContext";
 import OneButtonDialogBox from "./components/OneButtonDialogBox";
 
 
-const Login = ({ navigate, setToken, setPassword }) => {
-  const [user, setUser] = useState("");
+const Login = ({ navigate, setToken, setPassword, setUser }) => {
+  const [username, setUsername] = useState("");
   const [pwd, setPwd] = useState("");
   const [openDialogBox, setOpenDialogBox] = useState(false)
   const [buttonTitle, setButtonTitle] = useState("Error")
@@ -27,13 +27,15 @@ const Login = ({ navigate, setToken, setPassword }) => {
     try {
       const resp = await axios.post("https://interview.intrinsiccloud.net/auth/login", {
         password: pwd,
-        username: user
+        username: username
       })
       if (resp.status === 200) {
         setToken(resp.data.token)
         setPassword(pwd)
+        const userExtracted = username.split("@")
+        setUser(userExtracted[0])
         setPwd("");
-        setUser("");
+        setUsername("");
         navigate("/home")
         setAuth(true)
       }
@@ -58,8 +60,8 @@ const Login = ({ navigate, setToken, setPassword }) => {
           variant="outlined"
           type="text"
           id="username"
-          onChange={(e) => setUser(e.target.value)}
-          value={user}
+          onChange={(e) => setUsername(e.target.value)}
+          value={username}
           required
         />
         <InputField

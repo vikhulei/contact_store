@@ -7,12 +7,13 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 
-const DialogBox = ({openDialogBox, handleClickClose, action, buttonTitle, buttonText, token, contactId }) => {
+const DialogBox = ({openDialogBox, handleClickClose, action, buttonTitle, buttonText, token, contactId, user }) => {
 
 const deleteContact = async() => {
   try {
-    const resp = await axios.delete(`https://interview.intrinsiccloud.net/contacts/${contactId}?name=user3`,
-      { headers: { "Authorization": `Bearer ${token}` } },
+    const resp = await axios.delete(`https://interview.intrinsiccloud.net/contacts/${contactId}`,
+    { params: { name: user } ,
+      headers: { "Authorization": `Bearer ${token}` } },
     )
     if (resp.status === 200) {
       alert("deleted")
