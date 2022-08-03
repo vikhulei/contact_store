@@ -34,18 +34,6 @@ const PictureText = styled.p`
   margin-bottom: 6px;
 `
 
-const PictureWrapper = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 80%;
-  border: 1px solid black;
-  background-color: #63738a;
-  &: hover {
-    cursor: pointer;
-    box-shadow: 0px 0px 8px;
-  }
-`
-
 const PictureInput = styled.input`
   position: absolute;
   line-height: 150px;
@@ -61,9 +49,22 @@ const PictureInput = styled.input`
   }
 `
 
+const PictureWrapper = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 80%;
+  border: 1px solid black;
+  background-color: #63738a;
+  &: hover {
+    cursor: pointer;
+    box-shadow: 0px 0px 8px;
+  }
+`
+
 const Picture = styled.img`
   width: 100%;
-  object-fit: contain;
+  height: 100%;
+  object-fit: none;
 `
 
 const ButtonsWrapper = styled.div`
