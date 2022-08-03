@@ -19,10 +19,8 @@ const AddNumberButton = styled(GreyButton) `
 
 const ButtonsWrapper = styled.div `
 && {
-
   position: absolute;
   width: 100%;
-  
   display: flex;
   justify-content: space-between;
   // top: 120%;

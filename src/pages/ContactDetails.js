@@ -33,7 +33,7 @@ const ContactDetails = ({ navigate, token, contact, setContact, user, contactId,
 
   const handleDeleteDialogOpen = () => {
     if (!selectedContact) {
-      alert("select contact first")
+      alert("Select contact first")
       return
     }
     setOpenDeleteDialog(true);
@@ -75,7 +75,7 @@ const ContactDetails = ({ navigate, token, contact, setContact, user, contactId,
 
   const editContact = () => {
     if (!selectedContact) {
-      alert("select contact first")
+      alert("Select contact first")
       return
     }
     const numbersInArray = selectedContact.phoneNumbers.map((val) => val.phoneNumberFormatted.split("-") + "," + val.id + "," + val.category)

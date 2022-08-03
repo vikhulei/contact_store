@@ -32,7 +32,7 @@ const postNewPassword = async() => {
         headers: {"Authorization" : `Bearer ${token}`} })
 
       if (resp.status === 200) {
-        alert("all posted")
+        alert("Password has been changed")
       }
     } catch (error) {
       alert(error.toString())
@@ -48,13 +48,11 @@ const postNewPassword = async() => {
       } else if (newPassword.match
         (/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/)
         ) {
-        alert("now good")
-        console.log(token)
         postNewPassword()
-        // setOldPassword("")
-        // setNewPassword("")
-        // setRetypePassword("")
-        // handleClickClose()
+        setOldPassword("")
+        setNewPassword("")
+        setRetypePassword("")
+        handleClickClose()
       } else {
         alert("Password must be at least 8 characters long, containing at least one upper case, one lower case, one numeric and one special character")
       } 

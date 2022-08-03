@@ -16,7 +16,7 @@ const deleteContact = async() => {
       headers: { "Authorization": `Bearer ${token}` } },
     )
     if (resp.status === 200) {
-      alert("deleted")
+      alert("Contact has been deleted")
       deleteAction()
     }
   } catch (error) {

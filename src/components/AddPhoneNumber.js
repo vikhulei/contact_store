@@ -28,8 +28,6 @@ const FormControlCountry = styled(FormControl) `
 }
 `
 
-// https://interview.intrinsiccloud.net/utility/countries
-
 const AddPhoneNumber = ({ openAddPhoneNumber, handleClickClose, token, newNumber, setNewNumber, addNewNumber, phoneNumberFormatted, setPhoneNumberFormatted }) => {
 
   const [countries, setCountries] = useState([])
@@ -44,7 +42,6 @@ const getCountries = async () => {
   const result = await axios.get("https://interview.intrinsiccloud.net/utility/countries", 
   { headers: {"Authorization" : `Bearer ${token}`} }
   )
-  // console.log(result.data)
   setCountries(result.data)
 }
 

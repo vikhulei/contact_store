@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {GreyButton} from "../styles/GeneralStyles"
-import {SectionProfile, Wrapper, InputNames, InputContacts, PictureControlsWrapper, PictureText, PictureWrapper, PictureInput, Picture, ButtonsWrapper, UploadButton} from "../styles/ProfileStyles"
+import FormData from "form-data";
+import { GreyButton } from "../styles/GeneralStyles"
+import { SectionProfile, Wrapper, InputNames, InputContacts, PictureControlsWrapper, PictureText, PictureWrapper, PictureInput, Picture, ButtonsWrapper, UploadButton } from "../styles/ProfileStyles"
 import TwoButtonsDialogBox from "../components/TwoButtonsDialogBox";
 import ChangePassword from "../components/ChangePassword";
 
 
-const Profile = ({navigate, token, password}) => {
+const Profile = ({ navigate, token, password, user }) => {
   const [preview, setPreview] = useState(null)
   const [openDialogBox, setOpenDialogBox] = useState(false)
   const [openPasswordBox, setOpenPasswordBox] = useState(false)
@@ -14,6 +15,7 @@ const Profile = ({navigate, token, password}) => {
   const [buttonText, setButtonText] = useState("")
   const [profile, setProfile] = useState({})
   const [photo, setPhoto] = useState()
+  const [file, setFile] = useState()
 
   const handleClickOpen = () => {
     setOpenDialogBox(true);
@@ -38,46 +40,76 @@ const Profile = ({navigate, token, password}) => {
 
   const getImage = (e) => {
     const file = e.target.files[0]
-    const reader = new FileReader();
-    reader.onload = () => {
-      setPreview(reader.result)
-    }
-    reader.readAsDataURL(file)
+    setFile(file)
   }
+
+  const uploadImage = async () => {
+    console.log(file)
+    const formData = new FormData()
+    formData.append("filename", file)
+    console.log(formData)
+
+    try {
+      const resp = await axios.post("https://interview.intrinsiccloud.net/profile/profileImage",
+        formData,
+        {
+          params: { name: user },
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "content-type": "multipart/form-data",
+          }
+        })
+
+      if (resp.status === 200) {
+        alert("all posted")
+      }
+    } catch (error) {
+      alert(error.toString())
+      // handleClickOpen()
+    }
+
+  }
+
+  // const reader = new FileReader();
+  // reader.onload = () => {
+  //   setPreview(reader.result)
+  // }
+  // const test = reader.readAsDataURL(file)
+
+
+  // let data = new FormData();
+  // data.append('file', file, file.name);
+
+  // return (dispatch) => {
+  // axios.post(URL, data, {
+  //   headers: {
+  //     'accept': 'application/json',
+  //     'Accept-Language': 'en-US,en;q=0.8',
+  //     'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
+  //   }
+  // })
+
 
   const getProfile = async () => {
     const profileDetails = await axios.get(
       "https://interview.intrinsiccloud.net/profile",
-      { headers: {"Authorization" : `Bearer ${token}`} }
-      )
-      setProfile(profileDetails.data)
+      { headers: { "Authorization": `Bearer ${token}` } }
+    )
+    setProfile(profileDetails.data)
+
   }
 
-// const getPhoto = async () => {
-//   const photoDetails = await axios.get(
-//     "https://interview.intrinsiccloud.net/profile/profileImage/3",
-//     {headers: {"Authorization" : `Bearer ${token}`}})
-//     //  responseType:""})
-//     // const photoURL = URL.createObjectURL(photoDetails)
-//     // console.log(photoDetails.request.responseURL)
-//     setPhoto(photoDetails.request.responseURL)
-// }
+  const getPhoto = async () => {
+    const res = await fetch("https://interview.intrinsiccloud.net/profile/profileImage/3");
+    const imageBlob = await res.blob();
+    const imageObjectURL = URL.createObjectURL(imageBlob);
+    setPhoto(imageObjectURL);
+  };
 
-
-const getPhoto = async () => {
-  const res = await fetch("https://interview.intrinsiccloud.net/profile/profileImage/3");
-  const imageBlob = await res.blob();
-  const imageObjectURL = URL.createObjectURL(imageBlob);
-  // console.log(imageObjectURL)
-  setPhoto(imageObjectURL);
-};
-
-
-
-useEffect(() => {
-  getProfile()
-  getPhoto()
-}, [])
+  useEffect(() => {
+    getProfile()
+    getPhoto()
+  }, [])
 
   return (
     <SectionProfile>
@@ -105,12 +137,9 @@ useEffect(() => {
             <Picture src={photo} />
           </PictureWrapper>
           <UploadButton
-            variant="contained" onClick={(() => {
-              getPhoto()
-              setButtonTitle("Upload?")
-              setButtonText("Are you sure you want to upload this picture?")
-              // handleClickOpen()
-            })}>Upload</UploadButton>
+            variant="contained"
+            onClick={uploadImage}
+          >Upload</UploadButton>
         </PictureControlsWrapper>
         <InputNames
           label="First Name"
@@ -138,7 +167,7 @@ useEffect(() => {
           type="text"
           variant="standard"
           readOnly
-          value="2022-07-25T13:35:33.066+00:00"
+          value={profile.joinDate ? profile.joinDate : ""}
         />
         <ButtonsWrapper>
           <GreyButton variant="contained"

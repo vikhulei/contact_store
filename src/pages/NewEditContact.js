@@ -8,16 +8,6 @@ import AddPhoneNumber from "../components/AddPhoneNumber"
 
 const NewEditContact = ({ navigate, token, contact, setContact, user, contactId, isAddNew }) => {
 
-  // const [newContact, setNewContact] = useState(
-  //   {
-  //     company: "",
-  //     contactName: "",
-  //     phoneNumbers: [
-  //     ],
-  //     primaryEmailAddress: ""
-  //   }
-  // )
-
   const [newNumber, setNewNumber] = useState({
     areaCode: "",
     category: "HOME",
@@ -41,26 +31,24 @@ const NewEditContact = ({ navigate, token, contact, setContact, user, contactId,
   const addNewNumber = () => {
     contact.phoneNumbers.push(newNumber)
     setPhoneNumberFormatted(`${newNumber.countryCode}-${newNumber.areaCode}-${newNumber.number}#${newNumber.extension}`)
-    console.log(contact.phoneNumbers)
     handleClickClose()
   }
 
-const saveButton = () => {
-  isAddNew ? saveContact() : editContact()
-}
+  const saveButton = () => {
+    isAddNew ? saveContact() : editContact()
+  }
 
   const saveContact = async () => {
-    // e.preventDefault();
-    console.log(contact)
     try {
       const resp = await axios.post("https://interview.intrinsiccloud.net/contacts",
         contact,
-        { params: { name: user } ,
-         headers: { "Authorization": `Bearer ${token}` } },
+        {
+          params: { name: user },
+          headers: { "Authorization": `Bearer ${token}` }
+        },
       )
-      console.log(resp)
       if (resp.status === 200) {
-        alert("all is good")
+        alert("Changes saved")
         setContact({
           company: "",
           contactName: "",
@@ -77,17 +65,16 @@ const saveButton = () => {
   }
 
   const editContact = async () => {
-    // e.preventDefault();
-    console.log(contact)
     try {
       const resp = await axios.put(`https://interview.intrinsiccloud.net/contacts/${contactId}`,
         contact,
-        { params: { name: user } ,
-         headers: { "Authorization": `Bearer ${token}` } },
+        {
+          params: { name: user },
+          headers: { "Authorization": `Bearer ${token}` }
+        },
       )
-      console.log(resp)
       if (resp.status === 200) {
-        alert("all is good")
+        alert("Changes saved")
         setContact({
           company: "",
           contactName: "",
@@ -106,7 +93,6 @@ const saveButton = () => {
 
   const deleteNumber = (id) => {
     setContact(prev => ({ ...prev, phoneNumbers: contact.phoneNumbers.filter((val, ind) => ind !== id) }))
-    console.log(contact)
   }
 
   return (
@@ -157,7 +143,6 @@ const saveButton = () => {
                   type="text"
                   variant="standard"
                   value={`(${val.countryCode}) ${val.areaCode}-${val.extension}-${val.number}`}
-                  // value={val.phoneNumberFormatted}
                 />
                 <GreyButton
                   variant="contained"
@@ -183,7 +168,7 @@ const saveButton = () => {
               variant="contained"
               style={{ "width": "40%" }}
               onClick={(() => navigate(-1))}
-              >
+            >
               Cancel
             </GreyButton>
           </ButtonsWrapper>
