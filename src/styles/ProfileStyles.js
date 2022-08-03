@@ -29,7 +29,7 @@ const PictureControlsWrapper = styled.div`
 `
 
 const PictureText = styled.p`
-  font-size: 11px;
+  font-size: 12px;
   font-style: italic;
   margin-bottom: 6px;
 `

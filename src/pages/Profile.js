@@ -8,21 +8,20 @@ import ChangePassword from "../components/ChangePassword";
 
 
 const Profile = ({ navigate, token, password, user }) => {
-  const [preview, setPreview] = useState(null)
-  const [openDialogBox, setOpenDialogBox] = useState(false)
+  const [openTwoButtonsDialogBox, setOpenTwoButtonsDialogBox] = useState(false)
   const [openPasswordBox, setOpenPasswordBox] = useState(false)
   const [buttonTitle, setButtonTitle] = useState("")
   const [buttonText, setButtonText] = useState("")
   const [profile, setProfile] = useState({})
   const [photo, setPhoto] = useState()
-  const [file, setFile] = useState()
+  const [image, setImage] = useState()
 
   const handleClickOpen = () => {
-    setOpenDialogBox(true);
+    setOpenTwoButtonsDialogBox(true);
   };
 
   const handleClickClose = () => {
-    setOpenDialogBox(false);
+    setOpenTwoButtonsDialogBox(false);
   };
 
   const handlePasswordOpen = () => {
@@ -34,20 +33,22 @@ const Profile = ({ navigate, token, password, user }) => {
   };
 
   const action = () => {
-    alert("Photo uploaded")
+    uploadImage()
     handleClickClose()
   }
 
   const getImage = (e) => {
     const file = e.target.files[0]
-    setFile(file)
+    setImage(file)
+    setButtonTitle("Change the image?")
+    setButtonText("Are you sure you want to upload this profile image?")
+    handleClickOpen()
   }
 
   const uploadImage = async () => {
-    console.log(file)
     const formData = new FormData()
-    formData.append("filename", file)
-    console.log(formData)
+    // formData.append("file", e.target.files[0])
+    formData.append("file", image)
 
     try {
       const resp = await axios.post("https://interview.intrinsiccloud.net/profile/profileImage",
@@ -61,34 +62,13 @@ const Profile = ({ navigate, token, password, user }) => {
         })
 
       if (resp.status === 200) {
-        alert("all posted")
+        alert("Image uploaded")
       }
     } catch (error) {
       alert(error.toString())
       // handleClickOpen()
     }
-
   }
-
-  // const reader = new FileReader();
-  // reader.onload = () => {
-  //   setPreview(reader.result)
-  // }
-  // const test = reader.readAsDataURL(file)
-
-
-  // let data = new FormData();
-  // data.append('file', file, file.name);
-
-  // return (dispatch) => {
-  // axios.post(URL, data, {
-  //   headers: {
-  //     'accept': 'application/json',
-  //     'Accept-Language': 'en-US,en;q=0.8',
-  //     'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
-  //   }
-  // })
-
 
   const getProfile = async () => {
     const profileDetails = await axios.get(
@@ -109,12 +89,12 @@ const Profile = ({ navigate, token, password, user }) => {
   useEffect(() => {
     getProfile()
     getPhoto()
-  }, [])
+  }, [photo])
 
   return (
     <SectionProfile>
       <TwoButtonsDialogBox
-        openDialogBox={openDialogBox}
+        openDialogBox={openTwoButtonsDialogBox}
         handleClickClose={handleClickClose}
         action={action}
         buttonTitle={buttonTitle}
@@ -131,15 +111,15 @@ const Profile = ({ navigate, token, password, user }) => {
       <h1>Profile</h1>
       <Wrapper>
         <PictureControlsWrapper>
-          <PictureText>Click to select new photo:</PictureText>
+          <PictureText>Click photo to upload a new profile image:</PictureText>
           <PictureWrapper>
             <PictureInput type="file" id="image" onChange={getImage} />
             <Picture src={photo} />
           </PictureWrapper>
-          <UploadButton
+          {/* <UploadButton
             variant="contained"
             onClick={uploadImage}
-          >Upload</UploadButton>
+          >Upload</UploadButton> */}
         </PictureControlsWrapper>
         <InputNames
           label="First Name"
