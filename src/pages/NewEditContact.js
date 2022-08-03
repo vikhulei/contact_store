@@ -6,17 +6,17 @@ import AddPhoneNumber from "../components/AddPhoneNumber"
 
 
 
-const NewEditContact = ({ navigate, token, contact, setContact, user }) => {
+const NewEditContact = ({ navigate, token, contact, setContact, user, contactId, isAddNew }) => {
 
-  const [newContact, setNewContact] = useState(
-    {
-      company: "",
-      contactName: "",
-      phoneNumbers: [
-      ],
-      primaryEmailAddress: ""
-    }
-  )
+  // const [newContact, setNewContact] = useState(
+  //   {
+  //     company: "",
+  //     contactName: "",
+  //     phoneNumbers: [
+  //     ],
+  //     primaryEmailAddress: ""
+  //   }
+  // )
 
   const [newNumber, setNewNumber] = useState({
     areaCode: "",
@@ -45,8 +45,12 @@ const NewEditContact = ({ navigate, token, contact, setContact, user }) => {
     handleClickClose()
   }
 
-  const saveNumber = async (e) => {
-    e.preventDefault();
+const saveButton = () => {
+  isAddNew ? saveContact() : editContact()
+}
+
+  const saveContact = async () => {
+    // e.preventDefault();
     console.log(contact)
     try {
       const resp = await axios.post("https://interview.intrinsiccloud.net/contacts",
@@ -72,8 +76,37 @@ const NewEditContact = ({ navigate, token, contact, setContact, user }) => {
     }
   }
 
+  const editContact = async () => {
+    // e.preventDefault();
+    console.log(contact)
+    try {
+      const resp = await axios.put(`https://interview.intrinsiccloud.net/contacts/${contactId}`,
+        contact,
+        { params: { name: user } ,
+         headers: { "Authorization": `Bearer ${token}` } },
+      )
+      console.log(resp)
+      if (resp.status === 200) {
+        alert("all is good")
+        setContact({
+          company: "",
+          contactName: "",
+          phoneNumbers: [
+          ],
+          primaryEmailAddress: ""
+        })
+        navigate(-1)
+      }
+    } catch (error) {
+      alert(error.toString())
+      // setButtonText(error.toString())
+      // handleClickOpen()
+    }
+  }
+
   const deleteNumber = (id) => {
     setContact(prev => ({ ...prev, phoneNumbers: contact.phoneNumbers.filter((val, ind) => ind !== id) }))
+    console.log(contact)
   }
 
   return (
@@ -123,8 +156,8 @@ const NewEditContact = ({ navigate, token, contact, setContact, user }) => {
                 <InputField
                   type="text"
                   variant="standard"
-                  // value={`(${val.countryCode}) ${val.areaCode}-${val.extension}-${val.number}`}
-                  value={val.phoneNumberFormatted}
+                  value={`(${val.countryCode}) ${val.areaCode}-${val.extension}-${val.number}`}
+                  // value={val.phoneNumberFormatted}
                 />
                 <GreyButton
                   variant="contained"
@@ -142,15 +175,14 @@ const NewEditContact = ({ navigate, token, contact, setContact, user }) => {
             <GreyButton
               variant="contained"
               style={{ "width": "40%" }}
-              onClick={saveNumber}>
+              onClick={saveButton}>
               Save
             </GreyButton>
 
             <GreyButton
               variant="contained"
               style={{ "width": "40%" }}
-              // onClick={(() => navigate(-1))}
-              onClick={(() => console.log(contact.phoneNumbers[1].phoneNumberFormatted))}
+              onClick={(() => navigate(-1))}
               >
               Cancel
             </GreyButton>

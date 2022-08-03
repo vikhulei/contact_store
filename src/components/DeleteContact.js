@@ -7,7 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 
-const DialogBox = ({openDialogBox, handleClickClose, action, buttonTitle, buttonText, token, contactId, user }) => {
+const DialogBox = ({openDialogBox, handleClickClose, deleteAction, buttonTitle, buttonText, token, contactId, user }) => {
 
 const deleteContact = async() => {
   try {
@@ -17,7 +17,7 @@ const deleteContact = async() => {
     )
     if (resp.status === 200) {
       alert("deleted")
-      action()
+      deleteAction()
     }
   } catch (error) {
     alert(error.toString())

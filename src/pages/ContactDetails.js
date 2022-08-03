@@ -5,10 +5,9 @@ import { Wrapper, InputFormControl, ButtonsFormControl, SectionContacts, SelectC
 import DeleteContact from "../components/DeleteContact";
 
 
-const ContactDetails = ({ navigate, token, contact, setContact, user }) => {
+const ContactDetails = ({ navigate, token, contact, setContact, user, contactId, setContactId, setIsAddNew }) => {
   const [contacts, setContacts] = useState([])
   const [selectedContact, setSelectedContact] = useState()
-  const [contactId, setContactId] = useState("")
   const [contactName, setContactName] = useState("")
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
 
@@ -16,12 +15,14 @@ const ContactDetails = ({ navigate, token, contact, setContact, user }) => {
   const getContacts = async () => {
     try {
       const resp = await axios.get("https://interview.intrinsiccloud.net/contacts",
-        { params: { name: user } ,
-         headers: { "Authorization": `Bearer ${token}` } },
+        {
+          params: { name: user },
+          headers: { "Authorization": `Bearer ${token}` }
+        },
       )
       if (resp.status === 200) {
         setContacts(resp.data)
-        setSelectedContact(contacts[0])
+        setSelectedContact(null)
       }
     } catch (error) {
       alert(error.toString())
@@ -31,6 +32,10 @@ const ContactDetails = ({ navigate, token, contact, setContact, user }) => {
   }
 
   const handleDeleteDialogOpen = () => {
+    if (!selectedContact) {
+      alert("select contact first")
+      return
+    }
     setOpenDeleteDialog(true);
   };
 
@@ -38,7 +43,7 @@ const ContactDetails = ({ navigate, token, contact, setContact, user }) => {
     setOpenDeleteDialog(false);
   };
 
-  const action = () => {
+  const deleteAction = () => {
     getContacts()
     handleDeleteDialogClose()
   }
@@ -64,14 +69,33 @@ const ContactDetails = ({ navigate, token, contact, setContact, user }) => {
       ],
       primaryEmailAddress: ""
     })
+    setIsAddNew(true)
     navigate("/newedit");
   }
 
-const editContact = () => {
-  setContact(selectedContact)
-  console.log(selectedContact)
+  const editContact = () => {
+    if (!selectedContact) {
+      alert("select contact first")
+      return
+    }
+    const numbersInArray = selectedContact.phoneNumbers.map((val) => val.phoneNumberFormatted.split("-") + "," + val.id + "," + val.category)
+    const hashtagReplaced = numbersInArray.map(val => val.replace("#", ","))
+    const numbersExtracted = hashtagReplaced.map(val => val.split(","))
+    const phoneNumbersPopulated = []
+    for (let i = 0; i < numbersExtracted.length; i++) {
+      phoneNumbersPopulated.push({ countryCode: numbersExtracted[i][0], areaCode: numbersExtracted[i][1], number: numbersExtracted[i][2], extension: numbersExtracted[i][3], id: numbersExtracted[i][4], category: numbersExtracted[i][5] })
+    }
+
+    setContact({
+      company: selectedContact.company,
+      contactName: selectedContact.contactName,
+      phoneNumbers: phoneNumbersPopulated,
+      primaryEmailAddress: selectedContact.primaryEmailAddress
+    })
+    setIsAddNew(false)
     navigate("/newedit");
   }
+
 
   useEffect(() => {
     getContacts();
@@ -85,7 +109,7 @@ const editContact = () => {
         handleClickClose={handleDeleteDialogClose}
         token={token}
         contactId={contactId}
-        action={action}
+        deleteAction={deleteAction}
         buttonTitle="Delete"
         buttonText={`Are you sure you want to delete ${contactName} from the database?`}
       />
@@ -127,12 +151,12 @@ const editContact = () => {
           <div>
             {selectedContact ? selectedContact.phoneNumbers.map((val, idx) => {
               return <div key={idx}>
-              <InputField
-                label="Phone number"
-                type="text"
-                variant="standard"
-                value={val.phoneNumberFormatted}
-              />
+                <InputField
+                  label="Phone number"
+                  type="text"
+                  variant="standard"
+                  value={val.phoneNumberFormatted}
+                />
               </div>
             }) : null}
           </div>
@@ -140,7 +164,9 @@ const editContact = () => {
         </InputFormControl>
         <ButtonsFormControl>
           <ButtonsWrapper>
-            <GreyButtonContacts variant="contained" onClick={editContact}>Edit</GreyButtonContacts>
+            <GreyButtonContacts variant="contained"
+              onClick={editContact}
+            >Edit</GreyButtonContacts>
             <GreyButtonContacts variant="contained" onClick={handleDeleteDialogOpen}>Delete</GreyButtonContacts>
           </ButtonsWrapper>
           <ButtonsWrapper>

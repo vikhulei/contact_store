@@ -17,6 +17,8 @@ const App = () => {
   const [token, setToken] = useState("")
   const [user, setUser] = useState("")
   const [contact, setContact] = useState()
+  const [contactId, setContactId] = useState("")
+  const [isAddNew, setIsAddNew] = useState()
 
   const navigate = useNavigate()
 
@@ -45,6 +47,10 @@ const App = () => {
             user={user}
             contact={contact}
             setContact={setContact}
+            contactId={contactId}
+            setContactId={setContactId}
+            isAddNew={isAddNew}
+            setIsAddNew={setIsAddNew}
             />} />
             <Route path="/newedit" element={<NewEditContact
               navigate={navigate}
@@ -52,6 +58,10 @@ const App = () => {
               user={user}
               contact={contact}
               setContact={setContact}
+              contactId={contactId}
+              setContactId={setContactId}
+              isAddNew={isAddNew}
+              setIsAddNew={setIsAddNew}
               />} />
           </Route>
         </Routes>
