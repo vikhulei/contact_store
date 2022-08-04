@@ -3,6 +3,7 @@ import axios from "axios";
 import { MenuItem, InputField } from "../styles/GeneralStyles"
 import { Wrapper, InputFormControl, ButtonsFormControl, SectionContacts, SelectContact, ButtonsWrapper, GreyButtonContacts } from "../styles/ContactDetailsStyles"
 import DeleteContact from "../components/DeleteContact";
+import OneButtonDialogBox from "../components/OneButtonDialogBox";
 
 
 const ContactDetails = ({ navigate, token, contact, setContact, user, contactId, setContactId, setIsAddNew }) => {
@@ -10,7 +11,17 @@ const ContactDetails = ({ navigate, token, contact, setContact, user, contactId,
   const [selectedContact, setSelectedContact] = useState()
   const [contactName, setContactName] = useState("")
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [openOneButtonDialogBox, setOpenOneButtonDialogBox] = useState(false)
+  const [buttonTitle, setButtonTitle] = useState("")
+  const [buttonText, setButtonText] = useState("")
 
+  const handleOneButtonOpen = () => {
+    setOpenOneButtonDialogBox(true);
+  };
+
+  const handleOneButtonClose = () => {
+    setOpenOneButtonDialogBox(false);
+  };
 
   const getContacts = async () => {
     try {
@@ -25,15 +36,17 @@ const ContactDetails = ({ navigate, token, contact, setContact, user, contactId,
         setSelectedContact(null)
       }
     } catch (error) {
-      alert(error.toString())
-      // setButtonText(error.toString())
-      // handleClickOpen()
+      setButtonTitle("Error")
+      setButtonText(error.toString())
+      handleOneButtonOpen()
     }
   }
 
   const handleDeleteDialogOpen = () => {
     if (!selectedContact) {
-      alert("Select contact first")
+      setButtonTitle("Try again")
+      setButtonText("Select contact first")
+      handleOneButtonOpen()
       return
     }
     setOpenDeleteDialog(true);
@@ -75,7 +88,9 @@ const ContactDetails = ({ navigate, token, contact, setContact, user, contactId,
 
   const editContact = () => {
     if (!selectedContact) {
-      alert("Select contact first")
+      setButtonTitle("Try again")
+      setButtonText("Select contact first")
+      handleOneButtonOpen()
       return
     }
     const numbersInArray = selectedContact.phoneNumbers.map((val) => val.phoneNumberFormatted.split("-") + "," + val.id + "," + val.category)
@@ -104,14 +119,22 @@ const ContactDetails = ({ navigate, token, contact, setContact, user, contactId,
   return (
 
     <SectionContacts>
+
+      <OneButtonDialogBox
+        openDialogBox={openOneButtonDialogBox}
+        handleClickClose={handleOneButtonClose}
+        buttonTitle={buttonTitle}
+        buttonText={buttonText}
+      />
+
       <DeleteContact
         openDialogBox={openDeleteDialog}
         handleClickClose={handleDeleteDialogClose}
         token={token}
         contactId={contactId}
         deleteAction={deleteAction}
-        buttonTitle="Delete"
-        buttonText={`Are you sure you want to delete ${contactName} from the database?`}
+        deleteButtonTitle="Deleting contact"
+        deleteButtonText={`Are you sure you want to delete ${contactName} from the database?`}
       />
 
       <h1>Contacts</h1>

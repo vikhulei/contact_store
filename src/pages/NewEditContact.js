@@ -3,6 +3,7 @@ import axios from "axios"
 import { InputField, GreyButton, FormControlContacts } from "../styles/GeneralStyles"
 import { Wrapper, SectionContacts, AddNumberButton, ButtonsWrapper, NumbersWrapper } from "../styles/NewEditContactStyles"
 import AddPhoneNumber from "../components/AddPhoneNumber"
+import OneButtonDialogBox from "../components/OneButtonDialogBox";
 
 
 
@@ -16,9 +17,22 @@ const NewEditContact = ({ navigate, token, contact, setContact, user, contactId,
     id: "",
     number: ""
   })
-
   const [openAddPhoneNumber, setOpenAddPhoneNumber] = useState(false)
   const [phoneNumberFormatted, setPhoneNumberFormatted] = useState()
+  const [openOneButtonDialogBox, setOpenOneButtonDialogBox] = useState(false)
+  const [buttonTitle, setButtonTitle] = useState("")
+  const [buttonText, setButtonText] = useState("")
+
+  const handleOneButtonOpen = () => {
+    setOpenOneButtonDialogBox(true);
+  };
+
+  const handleOneButtonClose = () => {
+    if(!isAddNew) {
+      navigate(-1)
+    }
+    setOpenOneButtonDialogBox(false);
+  };
 
   const handleClickOpen = () => {
     setOpenAddPhoneNumber(true);
@@ -48,7 +62,10 @@ const NewEditContact = ({ navigate, token, contact, setContact, user, contactId,
         },
       )
       if (resp.status === 200) {
-        alert("Changes saved")
+        setButtonTitle("Success")
+        setButtonText("Changes saved")
+        handleOneButtonOpen()
+        console.log(openOneButtonDialogBox)
         setContact({
           company: "",
           contactName: "",
@@ -58,9 +75,9 @@ const NewEditContact = ({ navigate, token, contact, setContact, user, contactId,
         })
       }
     } catch (error) {
-      alert(error.toString())
-      // setButtonText(error.toString())
-      // handleClickOpen()
+      setButtonTitle("Error")
+      setButtonText(error.toString())
+      handleOneButtonOpen()
     }
   }
 
@@ -74,7 +91,9 @@ const NewEditContact = ({ navigate, token, contact, setContact, user, contactId,
         },
       )
       if (resp.status === 200) {
-        alert("Changes saved")
+        setButtonTitle("Success")
+        setButtonText("Changes saved")
+        handleOneButtonOpen()
         setContact({
           company: "",
           contactName: "",
@@ -82,12 +101,11 @@ const NewEditContact = ({ navigate, token, contact, setContact, user, contactId,
           ],
           primaryEmailAddress: ""
         })
-        navigate(-1)
       }
     } catch (error) {
-      alert(error.toString())
-      // setButtonText(error.toString())
-      // handleClickOpen()
+      setButtonTitle("Error")
+      setButtonText(error.toString())
+      handleOneButtonOpen()
     }
   }
 
@@ -97,6 +115,14 @@ const NewEditContact = ({ navigate, token, contact, setContact, user, contactId,
 
   return (
     <SectionContacts>
+
+      <OneButtonDialogBox
+        openDialogBox={openOneButtonDialogBox}
+        handleClickClose={handleOneButtonClose}
+        buttonTitle={buttonTitle}
+        buttonText={buttonText}
+      />
+
       <h1>Contacts</h1>
       <Wrapper autoComplete="off">
         <FormControlContacts>
