@@ -1,20 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import FormData from "form-data";
+import { CircularProgress } from "@mui/material";
 import { GreyButton } from "../styles/GeneralStyles"
 import { SectionProfile, Wrapper, InputNames, InputContacts, PictureControlsWrapper, PictureText, PictureWrapper, PictureInput, Picture, ButtonsWrapper, UploadButton } from "../styles/ProfileStyles"
 import TwoButtonsDialogBox from "../components/TwoButtonsDialogBox";
+import OneButtonDialogBox from "../components/OneButtonDialogBox";
 import ChangePassword from "../components/ChangePassword";
 
 
 const Profile = ({ navigate, token, password, user }) => {
   const [openTwoButtonsDialogBox, setOpenTwoButtonsDialogBox] = useState(false)
+  const [openOneButtonDialogBox, setOpenOneButtonDialogBox] = useState(false)
   const [openPasswordBox, setOpenPasswordBox] = useState(false)
   const [buttonTitle, setButtonTitle] = useState("")
   const [buttonText, setButtonText] = useState("")
   const [profile, setProfile] = useState({})
   const [photo, setPhoto] = useState()
   const [image, setImage] = useState()
+  const [loading, setLoading] = useState(false)
+  const fileRef = useRef(null)
 
   const handleClickOpen = () => {
     setOpenTwoButtonsDialogBox(true);
@@ -32,6 +37,14 @@ const Profile = ({ navigate, token, password, user }) => {
     setOpenPasswordBox(false);
   };
 
+  const handleOneButtonOpen = () => {
+    setOpenOneButtonDialogBox(true);
+  };
+
+  const handleOneButtonClose = () => {
+    setOpenOneButtonDialogBox(false);
+  };
+
   const action = () => {
     uploadImage()
     handleClickClose()
@@ -39,18 +52,23 @@ const Profile = ({ navigate, token, password, user }) => {
 
   const getImage = (e) => {
     const file = e.target.files[0]
-    setImage(file)
-    setButtonTitle("Change the image?")
-    setButtonText("Are you sure you want to upload this profile image?")
-    handleClickOpen()
+    if (file) {
+      setImage(file)
+      fileRef.current.value = null
+      setButtonTitle("Change the image?")
+      setButtonText("Upload the selected image?")
+      handleClickOpen()
+    }
   }
 
   const uploadImage = async () => {
     const formData = new FormData()
-    // formData.append("file", e.target.files[0])
     formData.append("file", image)
-
     try {
+      setLoading(true)
+      setButtonTitle("Uploading the image")
+      setButtonText("Image has been uploaded")
+      handleOneButtonOpen()
       const resp = await axios.post("https://interview.intrinsiccloud.net/profile/profileImage",
         formData,
         {
@@ -60,30 +78,46 @@ const Profile = ({ navigate, token, password, user }) => {
             "content-type": "multipart/form-data",
           }
         })
-
       if (resp.status === 200) {
-        alert("Image uploaded")
+        setLoading(false)
+        setButtonTitle("Uploading the image")
+        setButtonText("Image has been successfully uploaded")
+        handleOneButtonOpen()
       }
     } catch (error) {
-      alert(error.toString())
-      // handleClickOpen()
+      setLoading(false)
+      setButtonTitle("Can't upload the file")
+      setButtonText(error.toString())
+      handleOneButtonOpen()
     }
   }
 
   const getProfile = async () => {
-    const profileDetails = await axios.get(
-      "https://interview.intrinsiccloud.net/profile",
-      { headers: { "Authorization": `Bearer ${token}` } }
-    )
-    setProfile(profileDetails.data)
+    try {
 
+      const profileDetails = await axios.get(
+        "https://interview.intrinsiccloud.net/profile",
+        { headers: { "Authorization": `Bearer ${token}` } }
+      )
+      setProfile(profileDetails.data)
+    } catch (error) {
+      setButtonTitle("Can't download profile details")
+      setButtonText(error.toString())
+      handleOneButtonOpen()
+    }
   }
 
   const getPhoto = async () => {
-    const res = await fetch("https://interview.intrinsiccloud.net/profile/profileImage/3");
-    const imageBlob = await res.blob();
-    const imageObjectURL = URL.createObjectURL(imageBlob);
-    setPhoto(imageObjectURL);
+    try {
+      const res = await fetch("https://interview.intrinsiccloud.net/profile/profileImage/3");
+      const imageBlob = await res.blob();
+      const imageObjectURL = URL.createObjectURL(imageBlob);
+      setPhoto(imageObjectURL);
+    } catch (error) {
+      setButtonTitle("Can't download profile image")
+      setButtonText(error.toString())
+      handleOneButtonOpen()
+    }
   };
 
   useEffect(() => {
@@ -93,6 +127,12 @@ const Profile = ({ navigate, token, password, user }) => {
 
   return (
     <SectionProfile>
+      <OneButtonDialogBox
+        openDialogBox={openOneButtonDialogBox}
+        handleClickClose={handleOneButtonClose}
+        buttonTitle={buttonTitle}
+        buttonText={loading ? <CircularProgress /> : buttonText}
+      />
       <TwoButtonsDialogBox
         openDialogBox={openTwoButtonsDialogBox}
         handleClickClose={handleClickClose}
@@ -108,18 +148,20 @@ const Profile = ({ navigate, token, password, user }) => {
         buttonTitle={buttonTitle}
         buttonText={buttonText}
       />
+
       <h1>Profile</h1>
       <Wrapper>
         <PictureControlsWrapper>
           <PictureText>Click photo to upload a new profile image:</PictureText>
           <PictureWrapper>
-            <PictureInput type="file" id="image" onChange={getImage} />
+            <PictureInput
+              type="file"
+              id="image"
+              ref={fileRef}
+              onChange={getImage}
+            />
             <Picture src={photo} />
           </PictureWrapper>
-          {/* <UploadButton
-            variant="contained"
-            onClick={uploadImage}
-          >Upload</UploadButton> */}
         </PictureControlsWrapper>
         <InputNames
           label="First Name"

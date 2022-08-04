@@ -8,6 +8,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import OneButtonDialogBox from "./OneButtonDialogBox";
+
 
 const Input = styled(TextField) `
     display: block;
@@ -19,6 +21,18 @@ const ChangePassword = ({openDialogBox, handleClickClose, buttonTitle, buttonTex
 const [oldPassword, setOldPassword] = useState("")
 const [newPassword, setNewPassword] = useState("")
 const [retypePassword, setRetypePassword] = useState("")
+const [openOneButtonDialogBox, setOpenOneButtonDialogBox] = useState(false)
+const [oneButtonTitle, setOneButtonTitle] = useState("")
+const [oneButtonText, setOneButtonText] = useState("")
+
+
+const handleOneButtonOpen = () => {
+  setOpenOneButtonDialogBox(true);
+};
+
+const handleOneButtonClose = () => {
+  setOpenOneButtonDialogBox(false);
+};
 
 const postNewPassword = async() => {
     
@@ -32,19 +46,26 @@ const postNewPassword = async() => {
         headers: {"Authorization" : `Bearer ${token}`} })
 
       if (resp.status === 200) {
-        alert("Password has been changed")
+        setOneButtonTitle("All correct")
+        setOneButtonText("Password has been changed")
+        handleOneButtonOpen()
       }
     } catch (error) {
-      alert(error.toString())
-      // handleClickOpen()
+      setOneButtonTitle("Error")
+      setOneButtonText(error.toString())
+      handleOneButtonOpen()
     }
 }
 
     const changePassword = () => {
       if(password !== oldPassword) {
-        alert("Current password is not correct")
+        setOneButtonTitle("Try again")
+        setOneButtonText("Your current password has not been entered correctly")
+        handleOneButtonOpen()
       } else if (newPassword !== retypePassword) {
-        alert("New password is not retyped correctly")
+        setOneButtonTitle("Try again")
+        setOneButtonText("New password is not retyped correctly")
+        handleOneButtonOpen()
       } else if (newPassword.match
         (/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/)
         ) {
@@ -54,7 +75,9 @@ const postNewPassword = async() => {
         setRetypePassword("")
         handleClickClose()
       } else {
-        alert("Password must be at least 8 characters long, containing at least one upper case, one lower case, one numeric and one special character")
+        setOneButtonTitle("Try again")
+        setOneButtonText("Password must be at least 8 characters long, containing at least one upper case, one lower case, one numeric and one special character")
+        handleOneButtonOpen()
       } 
     }
 
@@ -67,6 +90,14 @@ const postNewPassword = async() => {
 
   return (
     <div>
+      <OneButtonDialogBox
+        openDialogBox={openOneButtonDialogBox}
+        handleClickClose={handleOneButtonClose}
+        buttonTitle={oneButtonTitle}
+        buttonText={oneButtonText}
+      />
+
+
       <Dialog
         open={openDialogBox}
         onClose={handleClickClose}
@@ -110,7 +141,9 @@ const postNewPassword = async() => {
         />
         <DialogActions>
           <Button autoFocus onClick={changePassword}>Change</Button>
-          <Button onClick={cancelButton}>
+          <Button
+          onClick={cancelButton}
+          >
             Cancel
           </Button>
         </DialogActions>

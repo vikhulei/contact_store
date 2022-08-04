@@ -25,7 +25,7 @@ const PictureControlsWrapper = styled.div`
   top: 10px;
   right: 10px;
   width: 120px;
-  height: 190px;
+  height: 120px;
 `
 
 const PictureText = styled.p`
@@ -36,7 +36,7 @@ const PictureText = styled.p`
 
 const PictureInput = styled.input`
   position: absolute;
-  line-height: 150px;
+  line-height: 120px;
   width: 100%;
   opacity: 0;
   &: hover {
@@ -51,8 +51,9 @@ const PictureInput = styled.input`
 
 const PictureWrapper = styled.div`
   position: absolute;
+  top: 45px;
   width: 100%;
-  height: 80%;
+  height: 100%;
   border: 1px solid black;
   background-color: #63738a;
   &: hover {
@@ -63,8 +64,7 @@ const PictureWrapper = styled.div`
 
 const Picture = styled.img`
   width: 100%;
-  height: 100%;
-  object-fit: none;
+  object-fit: cover;
 `
 
 const ButtonsWrapper = styled.div`
